@@ -1,54 +1,113 @@
-# Ex.No: 6  Implementation of Jumping  behaviour- Unity
-### DATE: 25/02/26                                                                      
-### REGISTER NUMBER : 212223240107
+# Ex.No: 5  Implementation of Steering behaviour-Pursue and Evade in Unity
+### DATE: 25/02/26                                                                         
+### REGISTER NUMBER : 212223240163
 ### AIM: 
-To write a program to simulate the process of jumping in Unity.
+To write a program to simulate the process of Pursue and Evade behavior in Unity using NavigationMeshAgent. 
 ### Algorithm:
 ```
-1. Create a new 3D Unity project
-2. Add a Plane
-3. Right-click Hierarchy → 3D Object → Plane → Rename to Ground
-4. Add a Cube (Player)
-5. Right-click Hierarchy → 3D Object → Cube → Rename to Player
-6. Set Position: (0, 0.5, 0)
-7. Add a Rigidbody to the Player
-8. With the Player selected: Inspector → Add Component → Rigidbody
-9. Set Constraints > Freeze Rotation X, Z (optional for stability)
-10.Create the Jump Script and Apply the Script Player
-11.Run the game
-Press Play
-Press Spacebar to jump
-Your cube should only jump when touching the ground
-```
-###
-**Program **
-```
+1. Create a New Unity Project by Open the  Unity Hub and create a new 3D Project.
+2. Name the project "SteeringBehaviors" and select a location. Click Create.
+3.Open Unity Scene (default is SampleScene).
+  In the Hierarchy, create a Plane:
+  Right-click → 3D Object → Plane (this will be the ground).
+  Set its Scale to (10, 1, 10) for a larger surface.
+  Create three Capsule for the Player, Pursuer, and Evader:
+  Rename them to "Player", "Pursuer", and "Evader".
+  Set their Y Position to 0.5 (so they sit on the ground).
+  Change their Material for better distinction (optional).
+3. Check AI navigation in window.
+ Window → AI → Navigation (opens the Navigation tab).  If it is not available then add package by name "com.unity.ai.navigation"
+4. Select the Plane, go to the Navigation tab, and mark it as Navigation Static.
+   Go to the Bake tab and click Bake.
+   or
+   Add navMeshSurface to plane and bake 
+4. Add NavMeshAgent Component 
+    Select Pursuer, and Evader.
+    Click Add Component → Search for NavMeshAgent and add it.
+    Adjust NavMeshAgent Settings:
+    Player: Set Speed = 5.
+    Pursuer: Set Speed = 4.
+    Evader: Set Speed = 6.
+5. Write a script for  Player_movement behavior and save it
+
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerJump : MonoBehaviour
+public class Player_movement : MonoBehaviour
 {
-    private Rigidbody rb;
-    public float jumpForce = 5f;
-    
+    // Start is called before the first frame update
+    public float speed;
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        float xdir = Input.GetAxis("Horizontal") * speed;
+        float zdir = Input.GetAxis("Vertical") * speed;
+        transform.position=new Vector3(xdir,zdir);
     }
 
+    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) )
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            
-        }
+        
+    }
+}
+**Evader script**
+public class Evader : MonoBehaviour
+{
+    // Start is called before the first frame update
+    public NavMeshAgent agent;
+    public Transform target;
+    public float evadespeed;
+    void Start()
+    {
+        agent= GetComponent<NavMeshAgent>();
     }
 
-   
+    void evade()
+    {
+        Vector3 fleedir = transform.position - target.position;
+        Vector3 evadeposition = transform.position + fleedir.normalized * evadespeed;
+        agent.SetDestination(evadeposition);
+
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        evade();          
+     }
 }
+**Pursuer script**
+public class Pursuer: MonoBehaviour
+{
+    // Start is called before the first frame update
+    public NavMeshAgent agent;
+    public Transform target;
+    public float speed;
+    void Start()
+    {
+        agent=this.GetComponent<NavMeshAgent>();
+    }
+       // Update is called once per frame
+    void pursue()
+    {
+       Vector3 targetvelocity=target.position-transform.position;
+       Vector3 futurepos = transform.position + targetvelocity.normalized*speed;
+       agent.SetDestination(futurepos);
+    } 
+    // Update is called once per frame
+    void Update()
+    {
+        pursue();          
+     }
+}
+7. Attach the Script to each player,pursuer and Evader.
+   Drag & Drop the Target from the Hierarchy into the "Target" field in the script component ( For pursuer and Evader).
+12. Run the game 
+13. Stop the program
+    
 ```
 ### Output:
-![WhatsApp Image 2026-02-12 at 14 46 37](https://github.com/user-attachments/assets/079a2247-bd4b-4934-ae51-dd79c4fa40bd)
+![WhatsApp Image 2026-02-12 at 14 45 44](https://github.com/user-attachments/assets/9d8eb6d5-46fe-4788-ad59-1f4bfe2356bc)
 
 
 
@@ -59,4 +118,4 @@ public class PlayerJump : MonoBehaviour
 
 
 ### Result:
-Thus the simple jumping behavior was implemented successfully.
+Thus the simple pursue and evade behavior was implemented successfully.
